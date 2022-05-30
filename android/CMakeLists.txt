@@ -63,6 +63,7 @@ add_library(
         "${COMMON_SRC_DIR}/cpp/Tools/FeaturesConfig.cpp"
         "${COMMON_SRC_DIR}/cpp/LayoutAnimations/LayoutAnimationsProxy.cpp"
         "${COMMON_SRC_DIR}/cpp/AnimatedSensor/AnimatedSensorModule.cpp"
+        "${NODE_MODULES_DIR}/react-native/ReactCommon/react/nativemodule/core/ReactCommon/LongLivedObject.cpp"
 )
 
 # includes
@@ -82,6 +83,8 @@ target_include_directories(
         "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni"
         "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/java/com/facebook/react/turbomodule/core/jni"
         "${NODE_MODULES_DIR}/react-native/ReactCommon"
+        "${NODE_MODULES_DIR}/react-native/ReactCommon/react/nativemodule/core"
+        "${NODE_MODULES_DIR}/react-native/ReactCommon/react/nativemodule/core/ReactCommon"
         "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
         "${NODE_MODULES_DIR}/react-native/ReactCommon/jsi"
         "${NODE_MODULES_DIR}/react-native/ReactCommon/turbomodule/core"

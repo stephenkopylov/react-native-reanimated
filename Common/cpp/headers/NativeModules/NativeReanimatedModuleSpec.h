@@ -6,8 +6,10 @@
 
 #ifdef ONANDROID
 #include "TurboModule.h"
+#include "TurboModuleUtils.h"
 #else
 #include <ReactCommon/TurboModule.h>
+#include <ReactCommon/TurboModuleUtils.h>
 #endif
 
 #include <ReactCommon/CallInvoker.h>

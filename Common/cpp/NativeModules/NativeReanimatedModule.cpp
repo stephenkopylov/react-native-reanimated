@@ -222,22 +222,33 @@ jsi::Value NativeReanimatedModule::getViewProp(
     const jsi::Value &callback) {
   const int viewTagInt = static_cast<int>(viewTag.asNumber());
   std::string propNameStr = propName.asString(rt).utf8(rt);
-  jsi::Function fun = callback.getObject(rt).asFunction(rt);
-  std::shared_ptr<jsi::Function> funPtr =
-      std::make_shared<jsi::Function>(std::move(fun));
+  std::weak_ptr<CallbackWrapper> callbackWrapper =
+      react::CallbackWrapper::createWeak(
+          callback.getObject(rt).asFunction(rt), rt, jsInvoker_);
 
-  scheduler->scheduleOnUI([&rt, viewTagInt, funPtr, this, propNameStr]() {
-    const jsi::String propNameValue =
-        jsi::String::createFromUtf8(rt, propNameStr);
-    jsi::Value result = propObtainer(rt, viewTagInt, propNameValue);
-    std::string resultStr = result.asString(rt).utf8(rt);
+  scheduler->scheduleOnUI(
+      [&rt, viewTagInt, callbackWrapper, this, propNameStr]() {
+        auto strongWrapper = callbackWrapper.lock();
+        if (!strongWrapper) {
+          return;
+        }
 
-    scheduler->scheduleOnJS([&rt, resultStr, funPtr]() {
-      const jsi::String resultValue =
-          jsi::String::createFromUtf8(rt, resultStr);
-      funPtr->call(rt, resultValue);
-    });
-  });
+        const jsi::String propNameValue =
+            jsi::String::createFromUtf8(rt, propNameStr);
+        jsi::Value result = propObtainer(rt, viewTagInt, propNameValue);
+        std::string resultStr = result.asString(rt).utf8(rt);
+
+        scheduler->scheduleOnJS([&rt, resultStr, callbackWrapper]() {
+          auto strongWrapper = callbackWrapper.lock();
+          if (!strongWrapper) {
+            return;
+          }
+
+          const jsi::String resultValue =
+              jsi::String::createFromUtf8(rt, resultStr);
+          strongWrapper->callback().call(rt, resultValue);
+        });
+      });
 
   return jsi::Value::undefined();
 }
